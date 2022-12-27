@@ -10,12 +10,40 @@ jobs:
     name: Update latest user agents
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v3
         with:
-          python-version: '3.9.x'
-      - run: python --version
-      - run: pip install -r requirements.txt
-      - run: python update.py
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Scrap UAs
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CI: "true"
+        run: python main.py
+
+      - name: Move build files to repo folder
+        run: rsync -a --delete --exclude .git --exclude .nojekyll --exclude index.html build/ gh-pages/
+
+      - name: Push repo changes
+        run: |
+          cd gh-pages
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Update User Agents"
+            git push
+          else
+            echo "No changes to commit"
+          fi
