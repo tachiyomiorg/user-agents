@@ -4,7 +4,8 @@ on:
     branches:
       - main
   schedule:
-    - cron:  '0 0 * * *'
+    - cron: '0 0 * *  MON'
+
 jobs:
   build:
     name: Update latest user agents
@@ -42,7 +43,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           if [ -n "$(git status --porcelain)" ]; then
             git add .
-            git commit -m "Update User Agents"
+            git commit -m "Update user agents"
             git push
           else
             echo "No changes to commit"

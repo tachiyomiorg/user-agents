@@ -2,6 +2,4 @@ __pycache__/
 *.py[cod]
 venv/
 build/
-
-# IDE related
 .idea/
