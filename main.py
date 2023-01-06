@@ -10,25 +10,24 @@ import requests
 from lxml import html
 
 build_path = Path().cwd().joinpath("build")
-build_path.mkdir(exist_ok=True)
+build_path.mkdir(exist_ok = True)
 
 base_url = 'https://www.whatismybrowser.com/guides/the-latest-user-agent'
 
 browsers = ['chrome', 'firefox', 'safari', 'edge', 'opera', 'vivaldi']
 
 mobile_os_field_patterns = [
-    re.compile(r'windows mobile', flags=re.IGNORECASE),
-    re.compile(r'iphone', flags=re.IGNORECASE),
-    re.compile(r'ipad', flags=re.IGNORECASE),
-    re.compile(r'android', flags=re.IGNORECASE),
+    re.compile(r'windows mobile', flags = re.IGNORECASE),
+    re.compile(r'iphone', flags = re.IGNORECASE),
+    re.compile(r'ipad', flags = re.IGNORECASE),
+    re.compile(r'android', flags = re.IGNORECASE),
 ]
 
 desktop_os_field_patterns = [
-    re.compile(r'windows nt \d+\.\d+', flags=re.IGNORECASE),
-    re.compile(r'macintosh', flags=re.IGNORECASE),
-    re.compile(r'linux (x86_64|i686)', flags=re.IGNORECASE),
+    re.compile(r'windows nt \d+\.\d+', flags = re.IGNORECASE),
+    re.compile(r'macintosh', flags = re.IGNORECASE),
+    re.compile(r'linux (x86_64|i686)', flags = re.IGNORECASE),
 ]
-
 
 def get_user_agent() -> str:
     if os.getenv("CI", None) == "true":
@@ -39,7 +38,6 @@ def get_user_agent() -> str:
             return random.choice(desktop_uas)
 
     return input("Provide a user agent for scraping -> ").strip()
-
 
 def main():
     desktop_uas = []
@@ -63,7 +61,6 @@ def main():
 
             if any(p.match(t) for p, t in product(mobile_os_field_patterns, platform_tokens)):
                 mobile_uas.append(ua)
-
             elif any(p.match(t) for p, t in product(desktop_os_field_patterns, platform_tokens)):
                 desktop_uas.append(ua)
 
@@ -73,13 +70,14 @@ def main():
         "desktop": desktop_uas,
         "mobile": mobile_uas
     }
+
     for minified in [True, False]:
         file_path = build_path.joinpath(f"user-agents{'.min' if minified else ''}.json")
         with open(file_path, "w+") as file:
             json_str = json.dumps(
                 ua_dict,
-                indent=None if minified else 2,
-                separators=(",", ":") if minified else None,
+                indent = None if minified else 2,
+                separators = (",", ":") if minified else None,
             )
             file.write(json_str + '\n')
 

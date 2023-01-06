@@ -4,7 +4,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 0 * *  MON'
+    - cron: '0 0 * * MON'
 
 jobs:
   build:
@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Scrap UAs
+      - name: Scrape UAs
         env:
           CI: "true"
         run: python main.py
