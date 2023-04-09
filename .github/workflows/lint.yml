@@ -1,0 +1,17 @@
+name: Lint checker
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: Lint checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+
+      - name: Run black
+        uses: psf/black@stable
+        with:
+          # More info: https://black.readthedocs.io/en/stable/the_black_code_style/index.html#labels-stability-policy
+          version: "~= 23.0"
