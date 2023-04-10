@@ -1,6 +1,6 @@
 name: Lint checker
 
-on: [push, pull_request]
+on: pull_request
 
 jobs:
   lint:
@@ -10,8 +10,14 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v3
 
-      - name: Run black
-        uses: psf/black@stable
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          # More info: https://black.readthedocs.io/en/stable/the_black_code_style/index.html#labels-stability-policy
-          version: "~= 23.0"
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run black
+        run: black .
+
