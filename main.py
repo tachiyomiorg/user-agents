@@ -1,8 +1,5 @@
 import json
-import os
-import random
 import re
-import time
 from itertools import product
 from pathlib import Path
 
@@ -12,9 +9,7 @@ from lxml import html
 build_path = Path().cwd().joinpath("build")
 build_path.mkdir(exist_ok=True)
 
-base_url = "https://www.whatismybrowser.com/guides/the-latest-user-agent"
-
-browsers = ["chrome", "firefox", "safari", "edge", "opera", "vivaldi"]
+base_url = "https://www.useragents.me"
 
 mobile_os_field_patterns = [
     re.compile(r"windows mobile", flags=re.IGNORECASE),
@@ -30,51 +25,32 @@ desktop_os_field_patterns = [
 ]
 
 
-def get_user_agent() -> str:
-    if os.getenv("CI", None) == "true":
-        # Running in CI (GitHub Actions)
-        print("Running in CI mode")
-        with open("gh-pages/user-agents.min.json") as ua_file:
-            desktop_uas = json.load(ua_file)["desktop"]
-            return random.choice(desktop_uas)
-
-    return input("Provide a user agent for scraping -> ").strip()
-
-
 def main():
     desktop_uas = []
     mobile_uas = []
 
-    user_agent = get_user_agent()
+    response = requests.get(base_url)
+    ua_elements = html.fromstring(response.content).cssselect("textarea")
 
-    for browser in browsers:
-        print(f"Collecting user agents of {browser}")
-        response = requests.get(
-            f"{base_url}/{browser}", headers={"User-Agent": user_agent}
-        )
+    for element in ua_elements:
+        ua = element.text_content().strip()
+        if not ua.startswith("Mozilla/5.0 ("):
+            continue
 
-        ua_elements = html.fromstring(response.content).cssselect("td li span.code")
+        platform = ua[len("Mozilla/5.0 (") : ua.find(")")].lower()
+        platform_tokens = [p.strip() for p in platform.split(";")]
 
-        for element in ua_elements:
-            ua = element.text_content().strip()
-            if not ua.startswith("Mozilla/5.0 ("):
-                continue
+        if any(
+            p.match(t) for p, t in product(mobile_os_field_patterns, platform_tokens)
+        ):
+            mobile_uas.append(ua)
+        elif any(
+            p.match(t) for p, t in product(desktop_os_field_patterns, platform_tokens)
+        ):
+            desktop_uas.append(ua)
 
-            platform = ua[len("Mozilla/5.0 (") : ua.find(")")].lower()
-            platform_tokens = [p.strip() for p in platform.split(";")]
-
-            if any(
-                p.match(t)
-                for p, t in product(mobile_os_field_patterns, platform_tokens)
-            ):
-                mobile_uas.append(ua)
-            elif any(
-                p.match(t)
-                for p, t in product(desktop_os_field_patterns, platform_tokens)
-            ):
-                desktop_uas.append(ua)
-
-            time.sleep(1)
+    if len(desktop_uas) == 0 or len(mobile_uas) == 0:
+        raise Exception("Failed to collect user agents")
 
     ua_dict = {"desktop": desktop_uas, "mobile": mobile_uas}
 

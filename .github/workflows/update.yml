@@ -14,12 +14,6 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v3
 
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v3
-        with:
-          ref: gh-pages
-          path: gh-pages
-
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -29,9 +23,13 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Scrape UAs
-        env:
-          CI: "true"
         run: python main.py
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          path: gh-pages
 
       - name: Move build files to repo folder
         run: rsync -a --delete --exclude .git --exclude .nojekyll --exclude index.html build/ gh-pages/
