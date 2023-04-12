@@ -30,7 +30,7 @@ def main():
     mobile_uas = []
 
     response = requests.get(base_url)
-    ua_elements = html.fromstring(response.content).cssselect("textarea")
+    ua_elements = html.fromstring(response.content).cssselect(".ua-textarea")
 
     for element in ua_elements:
         ua = element.text_content().strip()
