@@ -26,7 +26,6 @@ $('.ua-textarea').map((_index, el) => {
 });
 
 const userAgents = {
-    recommended: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0',
     desktop: desktopUserAgents.sort(),
     mobile: mobileUserAgents.sort(),
 };
