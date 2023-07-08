@@ -1,0 +1,18 @@
+{
+  "name": "user-agents",
+  "version": "1.0.0",
+  "description": "Occasionally fetches the latest user agent strings for major browsers and OSs.",
+  "license": "MPL-2.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tachiyomiorg/user-agents.git"
+  },
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "@types/node": "^18",
+    "cheerio": "^1.0.0-rc.12"
+  }
+}
