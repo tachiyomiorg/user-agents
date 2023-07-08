@@ -5,28 +5,40 @@ on:
       - main
   schedule:
     - cron: '0 0 * * MON'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
     name: Update latest user agents
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main branch
+      - name: Checkout repository
         uses: actions/checkout@v3
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Check cache
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm install
 
-      - name: Run black
-        run: black .
-
-      - name: Scrape UAs
-        run: python main.py
+      - name: Scrape user agents
+        run: npm run start
 
       - name: Checkout gh-pages branch
         uses: actions/checkout@v3

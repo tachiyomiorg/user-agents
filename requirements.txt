@@ -1,5 +1,0 @@
-# More info: https://black.readthedocs.io/en/stable/the_black_code_style/index.html#labels-stability-policy
-black ~= 23.0
-cssselect
-lxml
-requests
