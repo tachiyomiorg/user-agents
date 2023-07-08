@@ -6,8 +6,8 @@ const document = await request.text();
 
 const $ = cheerio.load(document);
 
-const desktopRegex = new RegExp('^Mozilla\\/5\\.0 \\((Windows|Linux|Macintosh).*$');
-const mobileRegex = new RegExp('^Mozilla\\/5\\.0 \\((iPhone|iPad|Android).*$');
+const desktopRegex = new RegExp('^Mozilla\\/5\\.0 \\((Windows NT 1|Macintosh|X11).*$');
+const mobileRegex = new RegExp('^Mozilla\\/5\\.0 \\((iPhone|iPad|Android|Linux; Android).*$');
 
 const desktopUserAgents = [];
 const mobileUserAgents = [];
